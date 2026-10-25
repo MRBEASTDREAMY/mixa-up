@@ -1,0 +1,590 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIXA OS</title>
+<style>
+:root {
+  --bg:#050711; --panel:#0c1020; --panel2:#11172c;
+  --line:#202943; --text:#f3f4ff; --muted:#929dbd;
+  --purple:#7957ff; --blue:#32baff;
+}
+* { box-sizing:border-box }
+body {
+  margin:0;background:var(--bg);color:var(--text);
+  font:14px/1.5 Inter,Arial,sans-serif;
+}
+button,input,select { font:inherit }
+button,a { -webkit-tap-highlight-color:transparent }
+button { cursor:pointer }
+a { color:inherit;text-decoration:none }
+button:focus-visible,a:focus-visible,input:focus-visible {
+  outline:2px solid var(--blue);outline-offset:3px;
+}
+.topbar {
+  height:66px;position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;gap:24px;
+  padding:0 25px;background:#080b17f5;
+  border-bottom:1px solid var(--line);backdrop-filter:blur(16px);
+}
+.brand { font-size:22px;font-weight:900;white-space:nowrap;letter-spacing:-1px }
+.brand span { color:#9676ff }
+.brand-mark { color:#42c5ff;margin-right:9px }
+.top-search { max-width:440px;margin:auto;width:100%;position:relative }
+.top-search input {
+  width:100%;border:1px solid #292f4d;border-radius:30px;
+  padding:11px 17px 11px 42px;background:#101426;color:white;
+}
+.search-symbol { position:absolute;left:15px;top:9px;font-size:18px;color:#9c8bff }
+.top-actions { display:flex;gap:8px }
+.icon-btn {
+  border:1px solid transparent;border-radius:12px;
+  background:transparent;color:#b7b5ff;padding:9px 11px;font-size:18px;
+}
+.icon-btn:hover { background:#191832;border-color:#37305f }
+.layout { display:grid;grid-template-columns:168px minmax(0,1fr) }
+.sidebar {
+  border-right:1px solid var(--line);padding:25px 13px;
+  min-height:calc(100vh - 112px);background:#080b15;
+}
+.nav-label {
+  color:#596580;font-size:10px;font-weight:bold;
+  letter-spacing:2px;margin:8px 12px 13px;
+}
+.nav-item {
+  display:flex;align-items:center;gap:13px;
+  width:100%;padding:12px;border-radius:12px;
+  color:#a8b2d1;margin-bottom:5px;background:transparent;
+  border:0;text-align:left;
+}
+.nav-item .symbol { font-size:18px;width:23px;text-align:center }
+.nav-item:hover,.nav-item.active {
+  color:white;background:linear-gradient(110deg,#38218a,#171a3c);
+}
+.nav-item.active { box-shadow:inset 2px 0 #9876ff }
+main { padding:25px 27px 55px;min-width:0;max-width:1550px;width:100%;margin:auto }
+.hero {
+  min-height:285px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center;
+  align-items:center;text-align:center;border:1px solid #30265f;
+  border-radius:22px;padding:32px 20px;
+  background:
+    radial-gradient(ellipse at 50% 115%,#1358bc88,transparent 48%),
+    radial-gradient(ellipse at 70% 10%,#7538e766,transparent 42%),
+    radial-gradient(ellipse at 15% 30%,#163e8170,transparent 40%),
+    linear-gradient(125deg,#11132b,#080b1a 65%,#14102c);
+}
+.hero:before {
+  content:"";position:absolute;width:440px;height:230px;
+  border:1px solid #8877ff55;border-radius:50%;
+  transform:rotate(-17deg);box-shadow:0 0 65px #6242ff22;
+}
+.hero:after {
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 20% 30%,#fff9 1px,transparent 2px),
+    radial-gradient(circle at 75% 20%,#b8cfffaa 1px,transparent 2px),
+    radial-gradient(circle at 62% 70%,#9d79ff99 1px,transparent 2px);
+  background-size:83px 71px,119px 97px,151px 109px;
+}
+.hero-content { position:relative;z-index:1;width:min(100%,600px) }
+.hero-logo { font-size:clamp(36px,5vw,58px);font-weight:950;letter-spacing:-2px }
+.hero-logo span { color:#8a72ff }
+.tagline { color:#aeb7df;letter-spacing:4px;font-size:11px;margin:3px 0 25px }
+.hero-search { display:flex;gap:8px;padding:6px;background:#090d1eea;
+  border:1px solid #5c4f9c;border-radius:30px; }
+.hero-search input { background:transparent;border:0;color:white;
+  outline:none!important;min-width:0;flex:1;padding:9px 12px; }
+.go {
+  background:linear-gradient(120deg,#7957ff,#4b83ff);
+  border:0;border-radius:24px;padding:9px 17px;color:white;font-weight:bold;
+}
+.section-head { display:flex;align-items:center;justify-content:space-between;gap:12px;margin:29px 0 15px }
+.section-head h2 { font-size:18px;margin:0;font-weight:750 }
+.muted { color:var(--muted) }
+.categories { display:flex;gap:9px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:thin }
+.chip {
+  flex-shrink:0;border:1px solid #272c49;border-radius:25px;
+  background:#0c1020;color:#b8c0df;padding:9px 16px;
+}
+.chip:hover,.chip.active { background:#382582;color:white;border-color:#7257ff }
+.primary,.secondary {
+  border:1px solid #6c55e9;border-radius:10px;padding:10px 14px;
+  color:white;background:linear-gradient(110deg,#6342e8,#4031a2);
+}
+.secondary { background:#11162a;border-color:#303857;color:#d8dcf5 }
+.grid { display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px }
+.game {
+  min-width:0;overflow:hidden;border:1px solid #252c46;
+  border-radius:13px;background:linear-gradient(150deg,#131a31,#0b0f1e);
+  transition:transform .18s,border-color .18s;
+}
+.game:hover { transform:translateY(-4px);border-color:#7460ff }
+.cover {
+  height:133px;display:grid;place-items:center;position:relative;
+  background:linear-gradient(140deg,#151b34,#101428);
+  color:#596588;overflow:hidden;
+}
+.cover img { width:100%;height:100%;object-fit:cover;position:absolute;inset:0 }
+.placeholder { text-align:center;font-size:27px }
+.placeholder small { display:block;font-size:10px;color:#7783a7;letter-spacing:1px;margin-top:4px }
+.game-info { padding:12px }
+.game-title { font-size:13px;font-weight:bold;overflow-wrap:anywhere }
+.game-meta { display:flex;align-items:center;justify-content:space-between;gap:5px;margin-top:5px;color:var(--muted);font-size:11px }
+.game-actions { display:flex;gap:6px;margin-top:12px }
+.play { flex:1;text-align:center;border-radius:7px;padding:7px;background:#362578;color:#fff;font-size:12px }
+.edit { border:1px solid #333b59;background:#171b2c;color:#d8d9f5;border-radius:7px;padding:6px 8px }
+.empty {
+  min-height:155px;border:1px dashed #343653;border-radius:15px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:20px;color:var(--muted);gap:9px;
+}
+.empty .big { font-size:29px;color:#8273ff }
+.empty p { margin:0 }
+.content-layout { display:grid;grid-template-columns:minmax(0,1fr) 255px;gap:23px }
+.right-column { padding-top:12px }
+.widget {
+  border:1px solid var(--line);border-radius:15px;background:#0b0f1c;
+  padding:17px;margin-bottom:16px;
+}
+.widget h3 { font-size:15px;margin:0 0 15px }
+.widget p { color:var(--muted);font-size:12px;line-height:1.8 }
+.widget-link { display:block;padding:10px 0;color:#b9c3e6;border-bottom:1px solid #1c2339 }
+.widget-link:last-child { border:0 }
+.web-input { display:flex;flex-direction:column;gap:9px }
+.web-input input,.field {
+  width:100%;background:#0a0e1c;color:white;border:1px solid #303752;
+  border-radius:9px;padding:11px;
+}
+footer {
+  padding:20px 25px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  color:#7784aa;font-size:12px;background:#080b15;
+}
+.modal-backdrop {
+  position:fixed;inset:0;z-index:10;background:#02040cdd;
+  display:none;align-items:center;justify-content:center;padding:18px;
+}
+.modal-backdrop.open { display:flex }
+.modal {
+  width:min(100%,470px);max-height:90vh;overflow:auto;
+  padding:23px;border-radius:18px;border:1px solid #41416c;
+  background:#101426;box-shadow:0 20px 100px #000a;
+}
+.modal h2 { margin:0 0 7px }
+.form-fields { display:grid;gap:13px;margin:20px 0 }
+.form-fields label { display:grid;gap:6px;color:#b7c1e0;font-size:12px }
+.form-actions { display:flex;justify-content:flex-end;gap:9px }
+.notice { font-size:11px;color:#8e9abc;line-height:1.6 }
+body.light { --bg:#eff0fa;--panel:#fff;--text:#17182a;--line:#d5d9eb }
+body.light .sidebar,body.light .topbar,body.light footer { background:#f8f8ff }
+body.light .top-search input,body.light .hero-search,body.light .web-input input { color:white }
+@media(max-width:1100px) {
+  .content-layout { grid-template-columns:1fr }
+  .right-column { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px }
+  .grid { grid-template-columns:repeat(4,minmax(0,1fr)) }
+}
+@media(max-width:720px) {
+  .topbar { height:60px;padding:0 12px;gap:9px }
+  .brand { font-size:18px }
+  .top-search { max-width:none }
+  .top-search input { padding:9px 9px 9px 32px;font-size:12px }
+  .search-symbol { left:10px;font-size:15px;top:7px }
+  .top-actions { gap:0 }
+  .top-actions .icon-btn { padding:8px;font-size:15px }
+  .layout { grid-template-columns:58px minmax(0,1fr) }
+  .sidebar { padding:18px 6px }
+  .nav-label { display:none }
+  .nav-item { justify-content:center;padding:12px 4px }
+  .nav-item .nav-text { display:none }
+  .nav-item .symbol { font-size:19px }
+  main { padding:16px 12px 35px }
+  .hero { min-height:240px;padding:22px 12px }
+  .tagline { letter-spacing:2px;font-size:9px }
+  .grid { grid-template-columns:repeat(2,minmax(0,1fr));gap:10px }
+  .cover { height:115px }
+  .game-info { padding:9px }
+  .right-column { grid-template-columns:1fr }
+  .section-head h2 { font-size:16px }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#home"><span class="brand-mark">✦</span>MIXA <span>OS</span></a>
+  <div class="top-search">
+    <span class="search-symbol">⌕</span>
+    <input id="topSearch" placeholder="Search anything..." aria-label="Search games">
+  </div>
+  <div class="top-actions">
+    <button class="icon-btn" id="themeBtn" title="Change theme">☾</button>
+    <button class="icon-btn" id="settingsBtn" title="Settings">⚙</button>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="nav-label">MENU</div>
+  <button class="nav-item active" data-page="home"><span class="symbol">⌂</span><span class="nav-text">Home</span></button>
+  <button class="nav-item" data-page="games"><span class="symbol">♧</span><span class="nav-text">Games</span></button>
+  <button class="nav-item" data-page="web"><span class="symbol">◎</span><span class="nav-text">Web</span></button>
+  <div class="nav-label" style="margin-top:28px">LIBRARY</div>
+  <button class="nav-item" id="favoritesBtn"><span class="symbol">☆</span><span class="nav-text">Favorites</span></button>
+  <button class="nav-item" id="addBtn"><span class="symbol">＋</span><span class="nav-text">Add Game</span></button>
+</aside>
+
+<main id="home">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-logo">✦ MIXA <span>OS</span></div>
+      <div class="tagline">PLAY · EXPLORE · ENJOY</div>
+      <form class="hero-search" id="heroForm">
+        <input id="heroSearch" placeholder="Search games, websites, or anything..." aria-label="Search">
+        <button class="go" type="submit">➜</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="content-layout">
+    <div class="main-column">
+      <div class="categories" id="categories">
+        <button class="chip active" data-cat="All">▦ &nbsp; All</button>
+        <button class="chip" data-cat="Action">⚔ &nbsp; Action</button>
+        <button class="chip" data-cat="Adventure">△ &nbsp; Adventure</button>
+        <button class="chip" data-cat="Racing">⚑ &nbsp; Racing</button>
+        <button class="chip" data-cat="Puzzle">♧ &nbsp; Puzzle</button>
+        <button class="chip" data-cat="Arcade">♧ &nbsp; Arcade</button>
+      </div>
+
+      <div class="section-head" id="games">
+        <h2>✦ Your Games</h2>
+        <button class="secondary" id="sectionAdd">＋ Add Game</button>
+      </div>
+      <div id="gameGrid" class="grid"></div>
+      <div id="emptyState" class="empty">
+        <div class="big">＋</div>
+        <strong>Your library starts here</strong>
+        <p>Add your own game titles, pictures, categories, and links.</p>
+        <button class="primary" id="firstAdd">＋ Add Your First Game</button>
+      </div>
+
+      <div class="section-head"><h2>☆ Favorites</h2></div>
+      <p class="muted" id="favoriteText">Your favorite games will appear here.</p>
+    </div>
+
+    <aside class="right-column">
+      <div class="widget">
+        <h3>ϟ Quick Access</h3>
+        <a href="#games" class="widget-link">▣ &nbsp; All Games</a>
+        <a href="#games" id="recentLink" class="widget-link">◷ &nbsp; Recently Played</a>
+        <a href="#games" id="favLink" class="widget-link">☆ &nbsp; Favorites</a>
+        <a href="#web" class="widget-link">◎ &nbsp; Web Search</a>
+      </div>
+      <div class="widget">
+        <h3>✧ Welcome to MIXA</h3>
+        <p>Your own gaming space. Add your favorite games and make this dashboard yours.</p>
+        <button class="primary" id="welcomeAdd">Get Started ↗</button>
+      </div>
+      <div class="widget" id="web">
+        <h3>◎ Web Search</h3>
+        <p>Search the web or open a normal website.</p>
+        <form id="webForm" class="web-input">
+          <input id="webInput" placeholder="Search or enter a URL">
+          <button class="primary" type="submit">Open ↗</button>
+        </form>
+        <p class="notice">This opens websites directly. It is not a web proxy.</p>
+      </div>
+      <div class="widget">
+        <h3>⚙ Your Setup</h3>
+        <p id="setupText">0 games added · Your library is ready to customize.</p>
+        <button class="secondary" id="manageBtn">Manage Games</button>
+      </div>
+    </aside>
+  </div>
+</main>
+</div>
+
+<footer>
+  <span><strong>MIXA OS</strong> &nbsp; | &nbsp; Play. Explore. Enjoy.</span>
+  <span>Made by you ✦</span>
+</footer>
+
+<div class="modal-backdrop" id="backdrop">
+  <div class="modal">
+    <h2 id="modalTitle">Add a Game</h2>
+    <p class="muted">Fill in the details for your game.</p>
+    <form id="gameForm">
+      <div class="form-fields">
+        <label>Game title
+          <input class="field" id="gameName" required maxlength="70" placeholder="Enter a game name">
+        </label>
+        <label>Game link
+          <input class="field" id="gameUrl" required placeholder="https://example.com/game">
+        </label>
+        <label>Picture URL
+          <input class="field" id="gameImage" placeholder="https://example.com/picture.jpg">
+        </label>
+        <label>Or choose a picture from your device
+          <input class="field" id="imageFile" type="file" accept="image/*">
+        </label>
+        <label>Category
+          <select class="field" id="gameCategory">
+            <option>Action</option><option>Adventure</option>
+            <option>Racing</option><option>Puzzle</option>
+            <option>Arcade</option><option>Other</option>
+          </select>
+        </label>
+      </div>
+      <p class="notice">Changes are saved in this browser. They won't automatically appear for other visitors. For a public permanent update, edit your website files on GitHub.</p>
+      <div class="form-actions">
+        <button type="button" class="secondary" id="cancelBtn">Cancel</button>
+        <button type="submit" class="primary">Save Game</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const STORE = "mixa-os-games-v1";
+let games = [];
+try { games = JSON.parse(localStorage.getItem(STORE) || "[]"); }
+catch { games = []; }
+
+let category = "All";
+let favoritesOnly = false;
+let editingId = null;
+let chosenImage = "";
+let query = "";
+
+const $ = id => document.getElementById(id);
+const grid = $("gameGrid");
+
+function save() {
+  try {
+    localStorage.setItem(STORE, JSON.stringify(games));
+  } catch {
+    alert("Browser storage is full. Try using a smaller image.");
+  }
+}
+
+function safeUrl(value, image = false) {
+  try {
+    const u = new URL(value);
+    if (u.protocol === "https:" || (image && u.protocol === "data:")) {
+      if (u.protocol === "data:" && !/^data:image\/(png|jpeg|webp|gif);base64,/i.test(value)) return "";
+      return u.href;
+    }
+  } catch {}
+  return "";
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+function render() {
+  const visible = games.filter(g =>
+    (!favoritesOnly || g.favorite) &&
+    (category === "All" || g.category === category) &&
+    g.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  grid.innerHTML = visible.map(g => `
+    <article class="game">
+      <div class="cover">
+        ${g.image ? `<img src="${escapeHtml(g.image)}" alt="${escapeHtml(g.name)}" loading="lazy" onerror="this.remove()">` : ""}
+        <div class="placeholder">▧<small>YOUR IMAGE</small></div>
+      </div>
+      <div class="game-info">
+        <div class="game-title">${escapeHtml(g.name)}</div>
+        <div class="game-meta">
+          <span>${escapeHtml(g.category)}</span>
+          <button class="edit" data-fav="${g.id}" title="Toggle favorite">${g.favorite ? "★" : "☆"}</button>
+        </div>
+        <div class="game-actions">
+          <a class="play" href="${escapeHtml(g.url)}" target="_blank" rel="noopener noreferrer" data-play="${g.id}">Play ↗</a>
+          <button class="edit" data-edit="${g.id}" title="Edit game">✎</button>
+          <button class="edit" data-delete="${g.id}" title="Delete game">×</button>
+        </div>
+      </div>
+    </article>
+  `).join("");
+
+  $("emptyState").style.display = visible.length ? "none" : "flex";
+  $("favoriteText").textContent = games.some(g => g.favorite)
+    ? games.filter(g => g.favorite).map(g => g.name).join(" · ")
+    : "Your favorite games will appear here.";
+  $("setupText").textContent = `${games.length} games added · Your library is ready to customize.`;
+}
+
+function openModal(id = null) {
+  editingId = id;
+  chosenImage = "";
+  $("gameForm").reset();
+  $("modalTitle").textContent = id ? "Edit Game" : "Add a Game";
+  if (id) {
+    const g = games.find(x => x.id === id);
+    if (!g) return;
+    $("gameName").value = g.name;
+    $("gameUrl").value = g.url;
+    $("gameImage").value = g.image && !g.image.startsWith("data:") ? g.image : "";
+    $("gameCategory").value = g.category;
+    chosenImage = g.image || "";
+  }
+  $("backdrop").classList.add("open");
+}
+
+function closeModal() { $("backdrop").classList.remove("open"); }
+
+["addBtn","sectionAdd","firstAdd","welcomeAdd","manageBtn"].forEach(id =>
+  $(id).addEventListener("click", () => {
+    if (id === "manageBtn") {
+      favoritesOnly = false;
+      category = "All";
+      query = "";
+      $("topSearch").value = "";
+      render();
+      $("games").scrollIntoView({behavior:"smooth"});
+    } else openModal();
+  })
+);
+
+$("cancelBtn").addEventListener("click", closeModal);
+$("backdrop").addEventListener("click", e => {
+  if (e.target === $("backdrop")) closeModal();
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeModal();
+});
+
+$("imageFile").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 700000) {
+    alert("Please choose an image smaller than 700 KB.");
+    e.target.value = "";
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => { chosenImage = reader.result; };
+  reader.readAsDataURL(file);
+});
+
+$("gameForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("gameName").value.trim();
+  const url = safeUrl($("gameUrl").value.trim());
+  const imageInput = $("gameImage").value.trim();
+  const image = imageInput ? safeUrl(imageInput, true) : chosenImage;
+
+  if (!name) return alert("Enter a game title.");
+  if (!url) return alert("Enter a valid HTTPS game link.");
+  if (imageInput && !image) return alert("Enter a valid HTTPS picture URL.");
+
+  if (editingId) {
+    const g = games.find(x => x.id === editingId);
+    if (g) Object.assign(g, {name,url,image,category:$("gameCategory").value});
+  } else {
+    games.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+      name,url,image,category:$("gameCategory").value,favorite:false
+    });
+  }
+  save(); render(); closeModal();
+});
+
+grid.addEventListener("click", e => {
+  const fav = e.target.closest("[data-fav]");
+  const edit = e.target.closest("[data-edit]");
+  const del = e.target.closest("[data-delete]");
+  const play = e.target.closest("[data-play]");
+  if (fav) {
+    const g = games.find(x => x.id === fav.dataset.fav);
+    if (g) g.favorite = !g.favorite;
+    save(); render();
+  }
+  if (edit) openModal(edit.dataset.edit);
+  if (del && confirm("Delete this game from your library?")) {
+    games = games.filter(x => x.id !== del.dataset.delete);
+    save(); render();
+  }
+  if (play) {
+    try {
+      localStorage.setItem("mixa-os-recent", play.dataset.play);
+    } catch {}
+  }
+});
+
+$("categories").addEventListener("click", e => {
+  const b = e.target.closest("[data-cat]");
+  if (!b) return;
+  category = b.dataset.cat;
+  favoritesOnly = false;
+  document.querySelectorAll("[data-cat]").forEach(x =>
+    x.classList.toggle("active", x === b)
+  );
+  render();
+});
+
+function updateSearch(value) {
+  query = value.trim();
+  $("topSearch").value = value;
+  $("heroSearch").value = value;
+  render();
+}
+$("topSearch").addEventListener("input", e => updateSearch(e.target.value));
+$("heroForm").addEventListener("submit", e => {
+  e.preventDefault();
+  updateSearch($("heroSearch").value);
+  $("games").scrollIntoView({behavior:"smooth"});
+});
+
+$("favoritesBtn").addEventListener("click", () => {
+  favoritesOnly = true; category = "All"; query = "";
+  $("topSearch").value = ""; $("heroSearch").value = "";
+  document.querySelectorAll("[data-cat]").forEach(x =>
+    x.classList.toggle("active", x.dataset.cat === "All")
+  );
+  render();
+});
+$("favLink").addEventListener("click", () => $("favoritesBtn").click());
+
+document.querySelectorAll("[data-page]").forEach(b =>
+  b.addEventListener("click", () => {
+    document.querySelectorAll("[data-page]").forEach(x => x.classList.toggle("active", x === b));
+    const target = b.dataset.page;
+    if (target === "web") $("web").scrollIntoView({behavior:"smooth"});
+    else if (target === "games") $("games").scrollIntoView({behavior:"smooth"});
+    else window.scrollTo({top:0,behavior:"smooth"});
+  })
+);
+
+$("themeBtn").addEventListener("click", () => {
+  document.body.classList.toggle("light");
+  $("themeBtn").textContent = document.body.classList.contains("light") ? "☀" : "☾";
+});
+$("settingsBtn").addEventListener("click", () =>
+  alert("Use the theme button to change appearance, or Add Game to manage your library.")
+);
+
+$("webForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const value = $("webInput").value.trim();
+  if (!value) return;
+  let url;
+  try {
+    const candidate = new URL(/^[a-z][a-z0-9+.-]*:/i.test(value) ? value : "https://" + value);
+    if (!["http:","https:"].includes(candidate.protocol)) throw Error();
+    if (value.includes(".") && !/\s/.test(value)) url = candidate.href;
+  } catch {}
+  window.open(url || "https://www.google.com/search?q=" + encodeURIComponent(value),
+    "_blank","noopener,noreferrer");
+});
+
+render();
+</script>
+</body>
+</html>
